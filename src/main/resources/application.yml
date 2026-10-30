@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: iso20022-ai-assistant
+  ai:
+    openai:
+      # Works with OpenAI, or any OpenAI-compatible server (e.g. Ollama: OPENAI_BASE_URL=http://localhost:11434)
+      api-key: ${OPENAI_API_KEY:not-set}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.2
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-small}
+  cache:
+    # "simple" = in-memory; docker-compose switches this to "redis"
+    type: ${CACHE_TYPE:simple}
+    redis:
+      time-to-live: 1h
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+
+app:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    input-topic: payments.mt103.in
+    output-topic: payments.mt103.validated
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  health:
+    redis:
+      enabled: ${REDIS_HEALTH:false}
